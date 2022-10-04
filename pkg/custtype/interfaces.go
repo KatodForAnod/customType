@@ -1,15 +1,15 @@
 package custtype
 
 type CustomString interface {
-	
 }
 
 type Gauge interface {
-
 }
 
 type CustomBool interface {
-
+	Off()
+	On()
+	GetBool() bool
 }
 
 type CustomCounter8 interface {
@@ -28,5 +28,4 @@ type CustomCounter32 interface {
 }
 
 type CustomTimestamp interface {
-
 }
