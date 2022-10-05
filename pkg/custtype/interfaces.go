@@ -3,7 +3,10 @@ package custtype
 type CustomString interface {
 }
 
-type Gauge interface {
+type CustomGauge interface {
+	GetVal() int64
+	Multi(anotherVal int64) CustomGauge
+	Add(anotherVal int64) CustomGauge
 }
 
 type CustomBool interface {
