@@ -1,5 +1,7 @@
 package custtype
 
+import "time"
+
 type CustomString interface {
 }
 
@@ -31,4 +33,6 @@ type CustomCounter32 interface {
 }
 
 type CustomTimestamp interface {
+	GetValue() time.Time
+	TimeNowDifference() int64
 }

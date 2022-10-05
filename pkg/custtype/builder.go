@@ -3,9 +3,10 @@ package custtype
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 )
 
-type Builder struct {}
+type Builder struct{}
 
 func (b *Builder) CreateCustomBool(jsonBytes []byte) (CustomBool, error) {
 	newStruct := boolType{}
@@ -14,7 +15,7 @@ func (b *Builder) CreateCustomBool(jsonBytes []byte) (CustomBool, error) {
 		return nil, fmt.Errorf("CreateCustomBool err:%v", err)
 	}
 
-	return newStruct, nil
+	return &newStruct, nil
 }
 
 func (b *Builder) CreateCustomCounter8(jsonBytes []byte) (CustomCounter8, error) {
@@ -50,5 +51,15 @@ func (b *Builder) CreateCustomCounter32(jsonBytes []byte) (CustomCounter32, erro
 		return nil, fmt.Errorf("CreateCustomCounter32 err:%v", err)
 	}
 
+	return &newStruct, nil
+}
+
+func (b *Builder) CreateCustomGauge(value int64) (CustomGauge, error) {
+	newStruct := gauge{value: value}
+	return &newStruct, nil
+}
+
+func (b *Builder) CreateCustomTimestamp(tm time.Time) (CustomTimestamp, error) {
+	newStruct := timeStamp{value: tm}
 	return &newStruct, nil
 }
