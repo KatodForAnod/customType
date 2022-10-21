@@ -8,8 +8,11 @@ import (
 
 type Builder struct{}
 
-func (b *Builder) CreateCustomBool(jsonBytes []byte) (CustomBool, error) {
-	newStruct := boolType{}
+func (b *Builder) CreateCustomBool(jsonBytes []byte, customOn, customOff string) (CustomBool, error) {
+	newStruct := boolType{
+		customOff: customOff,
+		customOn:  customOn,
+	}
 	err := json.Unmarshal(jsonBytes, &newStruct)
 	if err != nil {
 		return nil, fmt.Errorf("CreateCustomBool err:%v", err)
