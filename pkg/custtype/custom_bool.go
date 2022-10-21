@@ -23,6 +23,10 @@ func (s *boolType) Off() {
 	s.value = false
 }
 
+func (s *boolType) SetValue(value bool) {
+	s.value = value
+}
+
 func (s *boolType) UnmarshalJSON(data []byte) error {
 	custStruct := struct {
 		Value string
