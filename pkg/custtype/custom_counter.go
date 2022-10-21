@@ -9,9 +9,10 @@ import (
 type intTypeSwitcher string
 
 const (
-	int8Type  intTypeSwitcher = "int8"
-	int16Type intTypeSwitcher = "int16"
-	int32Type intTypeSwitcher = "int32"
+	int8Type      intTypeSwitcher = "int8"
+	int16Type     intTypeSwitcher = "int16"
+	int32Type     intTypeSwitcher = "int32"
+	intCustomType intTypeSwitcher = "custom"
 
 	maxInt32 = 2147483647
 	maxInt16 = 32767
@@ -19,22 +20,24 @@ const (
 )
 
 type counterType struct {
-	value    interface{}
+	value     int64
+	customMax int64
+
 	switcher intTypeSwitcher
 	sync.Mutex
 }
 
-func (s *counterType) initCounter(typeInt intTypeSwitcher) error {
+func (s *counterType) initCounter(typeInt intTypeSwitcher, maxIntForCustom int64) error {
 	switch typeInt {
 	case int8Type:
 		s.switcher = typeInt
-		s.value = int(0)
 	case int16Type:
 		s.switcher = typeInt
-		s.value = int16(0)
 	case int32Type:
 		s.switcher = typeInt
-		s.value = int32(0)
+	case intCustomType:
+		s.switcher = typeInt
+		s.customMax = maxIntForCustom
 	default:
 		return fmt.Errorf("package: %s, func: %s, err: %s",
 			"custtype", "initCounter", "unsupport int type")
@@ -48,9 +51,7 @@ func (s *counterType) GetCounter32() int32 {
 	defer s.Unlock()
 
 	if s.switcher == int32Type {
-		if val, ok := s.value.(int32); ok {
-			return val
-		}
+		return int32(s.value)
 	}
 	return 0
 }
@@ -60,9 +61,7 @@ func (s *counterType) GetCounter8() int8 {
 	defer s.Unlock()
 
 	if s.switcher == int8Type {
-		if val, ok := s.value.(int8); ok {
-			return val
-		}
+		return int8(s.value)
 	}
 	return 0
 }
@@ -72,11 +71,51 @@ func (s *counterType) GetCounter16() int16 {
 	defer s.Unlock()
 
 	if s.switcher == int16Type {
-		if val, ok := s.value.(int16); ok {
-			return val
-		}
+		return int16(s.value)
 	}
 	return 0
+}
+
+func (s *counterType) GetCounter() int64 {
+	s.Lock()
+	defer s.Unlock()
+
+	if s.switcher == intCustomType {
+		return s.value
+	}
+	return 0
+}
+
+func (s *counterType) GetMaxInt() int64 {
+	return s.customMax
+}
+
+func (s *counterType) SetValue(value int64) error {
+	err := fmt.Errorf("SetValue func err: value %d too huge for %s type", value, s.switcher)
+
+	switch s.switcher {
+	case int8Type:
+		if value < maxInt8 {
+			return err
+		}
+	case int16Type:
+		if s.value < maxInt16 {
+			return err
+		}
+	case int32Type:
+		if s.value < maxInt32 {
+			return err
+		}
+	case intCustomType:
+		if s.value < s.customMax {
+			return err
+		}
+	default:
+		return fmt.Errorf("unsupport type %s", s.switcher)
+	}
+
+	s.value = value
+	return nil
 }
 
 func (s *counterType) Increment() {
@@ -85,16 +124,20 @@ func (s *counterType) Increment() {
 
 	switch s.switcher {
 	case int8Type:
-		if s.value.(int8) < maxInt8 {
-			s.value = s.value.(int8) + 1
+		if s.value < maxInt8 {
+			s.value = s.value + 1
 		}
 	case int16Type:
-		if s.value.(int16) < maxInt16 {
-			s.value = s.value.(int16) + 1
+		if s.value < maxInt16 {
+			s.value = s.value + 1
 		}
 	case int32Type:
-		if s.value.(int32) < maxInt32 {
-			s.value = s.value.(int32) + 1
+		if s.value < maxInt32 {
+			s.value = s.value + 1
+		}
+	case intCustomType:
+		if s.value < s.customMax {
+			s.value = s.value + 1
 		}
 	default:
 		return
@@ -115,24 +158,11 @@ func (s *counterType) UnmarshalJSON(data []byte) error {
 
 	err = fmt.Errorf("package: %s, func: %s, err: %s",
 		"custtype", "UnmarshalJSON", "unsupport int type")
-	switch s.switcher {
-	case int8Type:
-		if custStruct.Value > maxInt8 {
-			return err
-		}
-		s.value = int8(custStruct.Value)
-	case int16Type:
-		if custStruct.Value > maxInt16 {
-			return err
-		}
-		s.value = int16(custStruct.Value)
-	case int32Type:
-		if custStruct.Value > maxInt32 {
-			return err
-		}
-		s.value = int32(custStruct.Value)
-	default:
-		return err
+
+	err = s.SetValue(custStruct.Value)
+	if err != nil {
+		return fmt.Errorf("package: %s, func: %s, err: %s",
+			"custtype", "UnmarshalJSON", err)
 	}
 
 	return nil
