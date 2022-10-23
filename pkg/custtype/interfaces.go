@@ -44,5 +44,5 @@ type CustomCounter interface {
 
 type CustomTimestamp interface {
 	GetValue() time.Time
-	TimeNowDifference() int64
+	TimeNowDifference() time.Duration
 }

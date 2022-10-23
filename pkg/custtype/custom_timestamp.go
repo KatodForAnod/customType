@@ -10,6 +10,6 @@ func (t *timeStamp) GetValue() time.Time {
 	return t.value
 }
 
-func (t *timeStamp) TimeNowDifference() int64 {
-	return time.Now().Sub(t.value).Nanoseconds()
+func (t *timeStamp) TimeNowDifference() time.Duration {
+	return time.Now().Sub(t.value)
 }
