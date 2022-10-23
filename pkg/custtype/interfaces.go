@@ -32,6 +32,11 @@ type CustomCounter32 interface {
 	Increment()
 }
 
+type CustomCounter interface {
+	GetCounter() int64
+	Increment()
+}
+
 type CustomTimestamp interface {
 	GetValue() time.Time
 	TimeNowDifference() int64
