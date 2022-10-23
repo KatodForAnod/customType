@@ -91,6 +91,8 @@ func (s *counterType) GetMaxInt() int64 {
 }
 
 func (s *counterType) SetValue(value int64) error {
+	s.Lock()
+	defer s.Unlock()
 	err := fmt.Errorf("SetValue func err: value %d too huge for %s type", value, s.switcher)
 
 	switch s.switcher {
