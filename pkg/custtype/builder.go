@@ -6,9 +6,7 @@ import (
 	"time"
 )
 
-type Builder struct{}
-
-func (b *Builder) CreateCustomBool(jsonBytes []byte, customOn, customOff string) (CustomBool, error) {
+func CreateCustomBool(jsonBytes []byte, customOn, customOff string) (CustomBool, error) {
 	newStruct := boolType{
 		customOff: customOff,
 		customOn:  customOn,
@@ -21,48 +19,52 @@ func (b *Builder) CreateCustomBool(jsonBytes []byte, customOn, customOff string)
 	return &newStruct, nil
 }
 
-func (b *Builder) CreateCustomCounter8(jsonBytes []byte) (CustomCounter8, error) {
+func CreateCustomCounter8() (CustomCounter8, error) {
 	newStruct := counterType{}
-	newStruct.switcher = int8Type
-
-	err := json.Unmarshal(jsonBytes, &newStruct)
+	err := newStruct.initCounter(int8Type, 0)
 	if err != nil {
-		return nil, fmt.Errorf("CreateCustomCounter8 err:%v", err)
+		return nil, fmt.Errorf("CreateCustomCounter8 err: %v", err)
 	}
 
 	return &newStruct, nil
 }
 
-func (b *Builder) CreateCustomCounter16(jsonBytes []byte) (CustomCounter16, error) {
+func CreateCustomCounter16() (CustomCounter16, error) {
 	newStruct := counterType{}
-	newStruct.switcher = int16Type
-
-	err := json.Unmarshal(jsonBytes, &newStruct)
+	err := newStruct.initCounter(int16Type, 0)
 	if err != nil {
-		return nil, fmt.Errorf("CreateCustomCounter16 err:%v", err)
+		return nil, fmt.Errorf("CreateCustomCounter16 err: %v", err)
 	}
 
 	return &newStruct, nil
 }
 
-func (b *Builder) CreateCustomCounter32(jsonBytes []byte) (CustomCounter32, error) {
+func CreateCustomCounter32() (CustomCounter32, error) {
 	newStruct := counterType{}
-	newStruct.switcher = int32Type
-
-	err := json.Unmarshal(jsonBytes, &newStruct)
+	err := newStruct.initCounter(int32Type, 0)
 	if err != nil {
-		return nil, fmt.Errorf("CreateCustomCounter32 err:%v", err)
+		return nil, fmt.Errorf("CreateCustomCounter32 err: %v", err)
 	}
 
 	return &newStruct, nil
 }
 
-func (b *Builder) CreateCustomGauge(value int64) (CustomGauge, error) {
+func CreateCustomCounter(maxVal int64) (CustomCounter, error) {
+	newStruct := counterType{}
+	err := newStruct.initCounter(intCustomType, maxVal)
+	if err != nil {
+		return nil, fmt.Errorf("CreateCustomCounter err: %v", err)
+	}
+
+	return &newStruct, nil
+}
+
+func CreateCustomGauge(value int64) (CustomGauge, error) {
 	newStruct := gauge{value: value}
 	return &newStruct, nil
 }
 
-func (b *Builder) CreateCustomTimestamp(tm time.Time) (CustomTimestamp, error) {
+func CreateCustomTimestamp(tm time.Time) (CustomTimestamp, error) {
 	newStruct := timeStamp{value: tm}
 	return &newStruct, nil
 }
