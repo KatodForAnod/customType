@@ -6,9 +6,9 @@ type CustomString interface {
 }
 
 type CustomGauge interface {
-	GetVal() int64
-	Multi(anotherVal int64) CustomGauge
-	Add(anotherVal int64) CustomGauge
+	GetVal() float64
+	Multi(anotherVal float64) CustomGauge
+	Add(anotherVal float64) CustomGauge
 }
 
 type CustomBool interface {

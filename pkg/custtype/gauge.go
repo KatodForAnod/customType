@@ -3,24 +3,24 @@ package custtype
 import "encoding/json"
 
 type gauge struct {
-	value int64
+	value float64
 }
 
-func (c *gauge) GetVal() int64 {
+func (c *gauge) GetVal() float64 {
 	return c.value
 }
 
-func (c *gauge) Multi(anotherVal int64) CustomGauge {
+func (c *gauge) Multi(anotherVal float64) CustomGauge {
 	return &gauge{c.value * anotherVal}
 }
 
-func (c *gauge) Add(anotherVal int64) CustomGauge {
+func (c *gauge) Add(anotherVal float64) CustomGauge {
 	return &gauge{c.value + anotherVal}
 }
 
 func (c *gauge) UnmarshalJSON(data []byte) error {
 	custStruct := struct {
-		Value int64 `json:"value"`
+		Value float64 `json:"value"`
 	}{
 		Value: 0,
 	}
